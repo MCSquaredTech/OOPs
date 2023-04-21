@@ -10,6 +10,18 @@ export class FleetDataService {
         this.errors = [];
     }
 
+    getCarByLicense(licenseNumber) {
+        return this.cars.find(car => {
+            return car._license == licenseNumber;
+        })
+    }
+
+    getDroneByLicense(licenseNumber) { 
+        return this.drones.find(drone => {
+            return drone._license === licenseNumber;
+        })
+    }
+
     loadData(fleet) { 
         for (let data of fleet) { 
             switch(data.type) { 

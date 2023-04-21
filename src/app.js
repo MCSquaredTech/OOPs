@@ -8,6 +8,10 @@ dataService.loadData(fleet);
 
 console.log(dataService.cars);
 console.log(dataService.drones);
+
+let drone = dataService.getDroneByLicense('QRS678');
+console.log(drone);
+
 for (let e of dataService.errors) {
     console.log(e.message);
 }
