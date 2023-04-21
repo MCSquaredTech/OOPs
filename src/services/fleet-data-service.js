@@ -1,3 +1,4 @@
+
 import { Car } from '../classes/car.js';
 import { Drone } from '../classes/drone.js';
 import { DataError } from './data-error.js';
@@ -10,16 +11,16 @@ export class FleetDataService {
         this.errors = [];
     }
 
-    getCarByLicense(licenseNumber) {
-        return this.cars.find(car => {
-            return car._license == licenseNumber;
-        })
+    getByLicense(vehicles, licenseNumber) {
+        return vehicles.find(vObject => {
+            return vObject._license == licenseNumber;
+        });
     }
 
-    getDroneByLicense(licenseNumber) { 
-        return this.drones.find(drone => {
-            return drone._license === licenseNumber;
-        })
+    sortByLicenseNumber(vehicles) { 
+        return vehicles.sort((a, b) => { 
+            return a._license < b._license ? -1 : 1; 
+        }); 
     }
 
     loadData(fleet) { 
