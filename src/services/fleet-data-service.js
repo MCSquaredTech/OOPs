@@ -27,8 +27,8 @@ export class FleetDataService {
         for (let data of fleet) { 
             switch(data.type) { 
                 case 'car': 
-                    if(this.validateCarData(data));{
-                        let car = this.loadCar(data);
+                    if(this.validateVehicleType(data));{
+                        let car = this.createCar(data);
                         if(car) {
                             this.cars.push(car);
                         }
@@ -36,8 +36,8 @@ export class FleetDataService {
                     
                     break;
                 case 'drone': 
-                    if (this.validateDroneData(data)) { 
-                        let drone = this.loadDrone(data);
+                    if (this.validateVehicleType(data)) { 
+                        let drone = this.createDrone(data);
                         if (drone) { 
                             this.drones.push(drone); 
                         }
@@ -51,12 +51,28 @@ export class FleetDataService {
         }
     }
 
-    loadCar(car) { 
+    validateVehicleType(vehicle) {
+        let hasErrors = false;
+        let requiredProperties = '';
+
+        if (vehicle.type === 'car') { 
+            requiredProperties = 'license model latLong miles make'.split(' ');
+        } else if (vehicle.type === 'drone') {
+            requiredProperties = 'license model latLong airTimeHours base'.split(' '); 
+        }
+        for (let field of requiredProperties) {
+            if(!vehicle[field]) {
+                this.errors.push(new DataError(`Invalid field ${field} in ${vehicle.type}`, vehicle));
+                hasErrors = true;
+            }
+        }
+
+        return !hasErrors;
+    }
+
+    createCar(car) { 
         try {
-            let c = new Car(car.license, car.model, car.latLong);
-            c.miles = car.miles;
-            c.make = car.make;
-            return c;
+            return new Car(car.license, car.model, car.latLong, car.miles, car.make);
         }
         catch(e) { 
             this.errors.push(new DataError('Error loading car', car));
@@ -65,25 +81,9 @@ export class FleetDataService {
         
     }
 
-    validateCarData(car) { 
-        let requiredProps = 'license model latLong miles make'.split(' '); 
-        let hasErrors = false; 
-
-        for (let field of requiredProps) { 
-            if (!car[field]) {
-                this.errors.push(new DataError(`Invalid field ${field} in car data`, car));
-                hasErrors = true; 
-            }
-        }
-        return !hasErrors;
-    }
-
-    loadDrone(drone) { 
+    createDrone(drone) { 
         try {
-            let d = new Drone(drone.license, drone.model, drone.latLong); 
-            d.airTimeHours = drone.airTimeHours;
-            d.base = drone.base;
-            return d;
+            return new Drone(drone.license, drone.model, drone.latLong, drone.airTimeHours, drone.base); 
         }
         catch(e) { 
             this.errors.push(new DataError('Error loading drone', drone))
@@ -91,16 +91,4 @@ export class FleetDataService {
         return null; 
     }
 
-    validateDroneData(drone) { 
-        let requiredProps = 'license model latLong airTimeHours base'.split(' '); 
-        let hasErrors = false; 
-
-        for (let field of requiredProps) { 
-            if (!drone[field]) {
-                this.errors.push(new DataError(`Invalid field ${field} in drone data`, drone));
-                hasErrors = true; 
-            }
-        }
-        return !hasErrors;
-    }
 }
